@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            text-align: center; 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            margin: 0;
+            padding: 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        input { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 16px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        button { 
+            padding: 15px 30px; 
+            margin: 10px 0; 
+            background: #4a90e2; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s, transform 0.3s;
+            width: auto;
+        }
+        button:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+        }
+        #qrcode { 
+            display: inline-block; 
+            margin: 30px auto 20px; 
+            padding: 15px; 
+            background: white; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 12px;
+        }
+        #downloadBtn {
+            background: #28a745;
+        }
+        #downloadBtn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>QR Code Generator</h1>
+        <input type="text" id="url" placeholder="Enter URL here">
+        <button onclick="generateQR()">Generate QR Code</button>
+        <div id="qrcode"></div>
+        <button onclick="downloadQR()" id="downloadBtn" style="display: none;">Download as PNG</button>
+    </div>
+
+    <script>
+        let qrInstance;
+
+        function generateQR() {
+            const url = document.getElementById('url').value;
+            if (!url) return alert('Please enter a URL');
+
+            // Clear previous QR if exists
+            document.getElementById('qrcode').innerHTML = '';
+
+            qrInstance = new QRCode('qrcode', {
+                text: url,
+                width: 256,  // Display size
+                height: 256,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H  // High error correction
+            });
+
+            document.getElementById('downloadBtn').style.display = 'block';
+        }
+
+        function downloadQR() {
+            const url = document.getElementById('url').value;
+
+            // Create a temporary hidden div for high-res generation
+            const hiddenDiv = document.createElement('div');
+            hiddenDiv.style.display = 'none';
+            document.body.appendChild(hiddenDiv);
+
+            // Generate high-res QR
+            const highResQR = new QRCode(hiddenDiv, {
+                text: url,
+                width: 1024,  // High resolution for print/web quality
+                height: 1024,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Get the canvas from hidden div
+            const canvas = hiddenDiv.querySelector('canvas');
+            const dataURL = canvas.toDataURL('image/png');
+
+            // Download
+            const link = document.createElement('a');
+            link.download = 'qrcode.png';
+            link.href = dataURL;
+            link.click();
+
+            // Clean up
+            document.body.removeChild(hiddenDiv);
+        }
+    </script>
+</body>
+</html>
